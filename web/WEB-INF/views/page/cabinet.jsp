@@ -34,8 +34,8 @@
                 </div>
                 <div class="panel-body">
                     <ul>
-                        <form method="post">
-                            <li><button type="submit" class="fa fa-sign-out" name="signOut" value="Y">Sign out</button></li>
+                        <form method="post" action="${pageContext.request.contextPath}/logout">
+                            <li><button type="submit" class="fa fa-sign-out">Sign out</button></li>
                         </form>
                     </ul>
                 </div>

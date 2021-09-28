@@ -12,15 +12,16 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="tag-files" tagdir="/WEB-INF/tags" %>
 
+<c:set var="searchQuery" scope="page" value="${searchQuery}"/>
 <div id="productList" data-page-count="${pageCount}" data-page-number="1">
     <form>
         <select class="sort-block" name="java-navigator" onchange="top.location.href =
   this.options[this.selectedIndex].value;">
             <option value="#">Sort by ${sortingName == null ? 'Name: A-Z' : sortingName}</option>
-            <option value="?sort=magazine_name-asc">Name: A-Z</option>
-            <option value="?sort=magazine_name-desc">Name: Z-A</option>
-            <option value="?sort=price-asc">Price: Low to High</option>
-            <option value="?sort=price-desc">Price: High to Low</option>
+            <option value="?sort=magazine_name-asc${searchQuery}">Name: A-Z</option>
+            <option value="?sort=magazine_name-desc${searchQuery}">Name: Z-A</option>
+            <option value="?sort=price-asc${searchQuery}">Price: Low to High</option>
+            <option value="?sort=price-desc${searchQuery}">Price: High to Low</option>
         </select>
     </form>
     <div class="row">

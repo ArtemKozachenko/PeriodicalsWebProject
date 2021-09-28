@@ -4,6 +4,7 @@ import com.periodicals.constant.Constants;
 import com.periodicals.bean.Magazine;
 import com.periodicals.bean.Subscription;
 import com.periodicals.bean.User;
+import com.periodicals.exception.DBException;
 import com.periodicals.util.UserUtils;
 
 import javax.servlet.ServletException;
@@ -13,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.time.LocalDate;
 
 @WebServlet(name = "SubscribeServlet", urlPatterns = "/subscribe")
@@ -41,8 +41,10 @@ public class SubscribeServlet extends AbstractServlet {
         Subscription subscription = new Subscription(localDate, localDate.plusMonths(1), user, magazine);
         try {
             getUserManager().createNewSubscription(subscription);
-        } catch (SQLException exception) {
+        } catch (DBException exception) {
             exception.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
         user.getSubscriptions().add(subscription);
         session.setAttribute("subscribe", "Y");

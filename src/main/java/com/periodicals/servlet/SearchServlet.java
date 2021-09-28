@@ -2,6 +2,7 @@ package com.periodicals.servlet;
 
 import com.periodicals.constant.Constants;
 import com.periodicals.bean.Magazine;
+import com.periodicals.exception.DBException;
 import com.periodicals.util.RoutingUtils;
 
 import javax.servlet.ServletException;
@@ -9,8 +10,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "SearchServlet", urlPatterns = "/search")
@@ -22,13 +21,11 @@ public class SearchServlet extends AbstractServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //SearchForm searchForm = createSearchForm(request);
         String searchQuery = request.getParameter("query");
-        if (searchQuery == null) {
+        if (searchQuery == null && request.getQueryString() == null) {
             response.sendRedirect(request.getContextPath() + "/magazines");
             return;
         }
-
         String[] params = getSortingParams(request);
         String column = "";
         String order = "";
@@ -40,18 +37,21 @@ public class SearchServlet extends AbstractServlet {
         int noOfRecords = 0;
         int recordsLimit = getRecordsLimit(request);
         int offset = getOffset();
-        List<Magazine> magazines = new ArrayList<>();
+        List<Magazine> magazines;
         try {
             magazines = getMagazineManager().findMagazinesBySearchQuery(searchQuery, column, order,
                     recordsLimit, offset);
             noOfRecords = magazines.size();
-        } catch (SQLException exception) {
+        } catch (DBException exception) {
             exception.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
 
         setNoOfPages(request, noOfRecords,
                 Constants.MAX_PRODUCTS_PER_HTML_PAGE, Constants.ATT_NAME_NO_OF_MAGAZINE_PAGES);
         request.setAttribute("magazineList", magazines);
+        request.setAttribute("searchQuery", "&query=" + searchQuery);
         RoutingUtils.forwardToPage("magazineListView.jsp", request, response);
     }
 }

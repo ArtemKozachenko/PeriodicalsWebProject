@@ -28,9 +28,9 @@
         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
             <li><a href="${pageContext.request.contextPath}/cabinet">My Account</a></li>
             <li role="separator" class="divider"></li>
-            <form class="form" role="form" method="post" accept-charset="UTF-8">
-                <%--<li><a href="#">Sign out</a></li>--%>
-                <li><button type="submit" class="btn btn-danger btn-block" name="signOut" value="Y">Sign out</button></li>
+            <%--<li><a href="${pageContext.request.contextPath}/logout">Sign out</a></li>--%>
+            <form class="form" role="form" method="post" action="${pageContext.request.contextPath}/logout" accept-charset="UTF-8">
+                <li><button type="submit" class="btn btn-danger btn-block">Sign out</button></li>
             </form>
         </ul>
     </li>

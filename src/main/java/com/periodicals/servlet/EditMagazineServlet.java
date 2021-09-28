@@ -1,6 +1,7 @@
 package com.periodicals.servlet;
 
 import com.periodicals.bean.Magazine;
+import com.periodicals.exception.DBException;
 import com.periodicals.util.RoutingUtils;
 
 import javax.servlet.ServletException;
@@ -12,7 +13,6 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 
 @WebServlet(name = "EditMagazineServlet", urlPatterns = "/cabinet/editMagazine")
 @MultipartConfig(
@@ -49,9 +49,10 @@ public class EditMagazineServlet extends AbstractServlet {
             deleteOldImageIfNewUploaded(request, filePart);
             message = "Magazine with id '" + id + "' has been successfully edited";
             messageType = "success";
-        } catch (SQLException exception) {
+        } catch (DBException exception) {
             exception.printStackTrace();
-            messageType = "error";
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
         updateMagazineInSubscription(session, magazine);
         session.setAttribute("message", message);
@@ -69,8 +70,10 @@ public class EditMagazineServlet extends AbstractServlet {
         Magazine magazine = null;
         try {
             magazine = getMagazineManager().findMagazine(magazineId);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (DBException exception) {
+            exception.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
         if (magazine == null) {
             response.sendRedirect(request.getContextPath() + "/cabinet?page=1");

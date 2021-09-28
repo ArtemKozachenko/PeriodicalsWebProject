@@ -3,13 +3,13 @@ package com.periodicals.util;
 import com.periodicals.constant.Constants;
 import com.periodicals.bean.User;
 import com.periodicals.listener.SessionStorageListener;
+import com.periodicals.exception.DBException;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.sql.SQLException;
 import java.util.Collection;
 
 public class UserUtils {
@@ -17,7 +17,7 @@ public class UserUtils {
     private UserUtils() {
     }
 
-    public static void changeUserStatus(ServletContext servletContext, String status, int userId) throws SQLException {
+    public static void changeUserStatus(ServletContext servletContext, String status, int userId) throws DBException {
         Collection<HttpSession> sessions = SessionStorageListener.getSessionMap(servletContext).values();
         User user;
         for (HttpSession session : sessions) {

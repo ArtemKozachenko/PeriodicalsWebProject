@@ -29,6 +29,9 @@
                     <tr class="js-shop__item">
                         <td>
                             <div class="shopping-cart-item__title">
+                                ${user.firstName} ${user.lastName}
+                            </div>
+                            <div class="shopping-cart-item__title">
                                 Login: ${user.login}
                             </div>
                             <div class="shopping-cart-item__title">

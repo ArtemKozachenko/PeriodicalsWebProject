@@ -2,13 +2,13 @@ package com.periodicals.listener;
 
 import com.periodicals.constant.Constants;
 import com.periodicals.manager.CategoryManager;
+import com.periodicals.exception.DBException;
 import com.periodicals.manager.PublisherManager;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import java.sql.SQLException;
 
 @WebListener
 public class PeriodicalsApplicationListener implements ServletContextListener {
@@ -21,7 +21,7 @@ public class PeriodicalsApplicationListener implements ServletContextListener {
         try {
             servletContext.setAttribute(Constants.CATEGORY_LIST, categoryManager.findAllCategories());
             servletContext.setAttribute(Constants.PUBLISHER_LIST, publisherManager.findAllPublishers());
-        } catch (SQLException exception) {
+        } catch (DBException exception) {
             exception.printStackTrace();
         }
     }

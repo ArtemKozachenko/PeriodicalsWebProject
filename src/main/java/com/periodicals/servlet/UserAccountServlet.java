@@ -3,7 +3,7 @@ package com.periodicals.servlet;
 import com.periodicals.constant.Constants;
 import com.periodicals.bean.Magazine;
 import com.periodicals.bean.User;
-import com.periodicals.manager.DBException;
+import com.periodicals.exception.DBException;
 import com.periodicals.util.RoutingUtils;
 import com.periodicals.util.SubscriptionUtils;
 import com.periodicals.util.UserUtils;
@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,9 +36,10 @@ public class UserAccountServlet extends AbstractServlet {
                 getUserManager().updateWalletBalance(user);
                 message = "Your wallet has been successfully replenished for $ " + value;
                 messageType = "success";
-            } catch (SQLException exception) {
+            } catch (DBException exception) {
                 exception.printStackTrace();
-                messageType = "error";
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
             }
         }
         session.setAttribute("message", message);
@@ -51,8 +51,10 @@ public class UserAccountServlet extends AbstractServlet {
         User user = UserUtils.getLoginedUser(request.getSession());
         try {
             SubscriptionUtils.updateSubscriptionsStatus(user);
-        } catch (SQLException exception) {
+        } catch (DBException exception) {
             exception.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
 
         int noOfSubscriptionRecords = user.getSubscriptions().size();
@@ -69,13 +71,11 @@ public class UserAccountServlet extends AbstractServlet {
             magazines = getMagazineManager().findAllMagazines(null, null,
                     recordsLimit, offset);
             noOfMagazineRecords = getMagazineManager().getCountOfAllMagazines();
-        } catch (SQLException | DBException exception) {
+        } catch (DBException exception) {
             exception.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
-
-        /*} catch (DBException exception) {
-            exception.printStackTrace();
-        }*/
 
         setNoOfPages(request, noOfMagazineRecords,
                 Constants.MAX_PRODUCTS_PER_HTML_PAGE, Constants.ATT_NAME_NO_OF_MAGAZINE_PAGES);
@@ -88,8 +88,10 @@ public class UserAccountServlet extends AbstractServlet {
         try {
             users = getUserManager().findAllUsers(recordsUsrLimit, offsetUsr);
             noOfUserRecords = getUserManager().getCountOfAllUsers();
-        } catch (SQLException exception) {
+        } catch (DBException exception) {
             exception.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
         setNoOfPages(request, noOfUserRecords,
                 Constants.MAX_USERS_PER_HTML_PAGE, Constants.ATT_NAME_NO_OF_USER_PAGES);

@@ -2,9 +2,9 @@ package com.periodicals.util;
 
 import com.periodicals.bean.Subscription;
 import com.periodicals.bean.User;
+import com.periodicals.exception.DBException;
 import com.periodicals.manager.UserManager;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ public class SubscriptionUtils {
     private SubscriptionUtils() {
     }
 
-    public static void updateSubscriptionsStatus(User user) throws SQLException {
+    public static void updateSubscriptionsStatus(User user) throws DBException {
         List<Subscription> subscriptions = user.getSubscriptions();
         List<Subscription> expiredSubscriptions = new ArrayList<>();
         for (Subscription sub : subscriptions) {
@@ -28,7 +28,7 @@ public class SubscriptionUtils {
         }
     }
 
-    public static void frozeUserSubscriptions(User user) throws SQLException {
+    public static void frozeUserSubscriptions(User user) throws DBException {
         List<Subscription> subscriptions = user.getSubscriptions();
         for (Subscription sub : subscriptions) {
             sub.setStatus("frozen");
@@ -38,7 +38,7 @@ public class SubscriptionUtils {
         }
     }
 
-    public static void restoreUserSubscriptionsStatus(User user) throws SQLException {
+    public static void restoreUserSubscriptionsStatus(User user) throws DBException {
         List<Subscription> subscriptions = user.getSubscriptions();
         for (Subscription sub : subscriptions) {
             if (!LocalDate.now().isAfter(sub.getEndDate())) {

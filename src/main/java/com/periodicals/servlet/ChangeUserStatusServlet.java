@@ -1,5 +1,6 @@
 package com.periodicals.servlet;
 
+import com.periodicals.exception.DBException;
 import com.periodicals.util.RoutingUtils;
 import com.periodicals.util.UserUtils;
 
@@ -9,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.sql.SQLException;
 
 @WebServlet(name = "ChangeUserStatusServlet", urlPatterns = "/cabinet/changeUserStatus")
 public class ChangeUserStatusServlet extends AbstractServlet {
@@ -38,9 +38,10 @@ public class ChangeUserStatusServlet extends AbstractServlet {
             UserUtils.changeUserStatus(getServletContext(), status, userId);
             message = "Status of user '" + login + "' has been set to " + "'" + status + "'";
             messageType = "success";
-        } catch (SQLException exception) {
+        } catch (DBException exception) {
             exception.printStackTrace();
-            messageType = "error";
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
         HttpSession session = request.getSession();
         session.setAttribute("message", message);

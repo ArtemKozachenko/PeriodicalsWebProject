@@ -1,6 +1,7 @@
 package com.periodicals.util;
 
 import com.periodicals.bean.User;
+import com.periodicals.exception.DBException;
 import com.periodicals.manager.UserManager;
 
 import javax.crypto.SecretKeyFactory;
@@ -8,7 +9,6 @@ import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Base64;
 
@@ -45,7 +45,7 @@ public class PasswordUtils {
         }
     }
 
-    public static User verifyThePlainTextPassword(String textPassword, String login) throws SQLException {
+    public static User verifyThePlainTextPassword(String textPassword, String login) throws DBException {
         User user = UserManager.getInstance().findUserByLogin(login);
         if (user == null) {
             return null;

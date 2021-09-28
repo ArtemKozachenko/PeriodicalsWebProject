@@ -5,7 +5,6 @@ import com.periodicals.bean.Category;
 import com.periodicals.bean.Magazine;
 import com.periodicals.bean.Subscription;
 import com.periodicals.bean.User;
-import com.periodicals.form.SearchForm;
 import com.periodicals.manager.MagazineManager;
 import com.periodicals.manager.UserManager;
 import com.periodicals.util.SortingUtils;
@@ -113,13 +112,6 @@ public class AbstractServlet extends HttpServlet {
     public final void setNoOfPages(HttpServletRequest request, int noOfRecords, int maxValuesPerPage, String attrName) {
         int noOfPages = (int) Math.ceil(noOfRecords * 1.0 / maxValuesPerPage);
         request.setAttribute(attrName, noOfPages);
-    }
-
-    public final SearchForm createSearchForm(HttpServletRequest request) {
-        return new SearchForm(
-                request.getParameter("query"),
-                request.getParameterValues("category"),
-                request.getParameterValues("publisher"));
     }
 
     public final boolean canAfford(User user, BigDecimal price) {

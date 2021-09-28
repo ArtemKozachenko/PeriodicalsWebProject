@@ -2,6 +2,7 @@ package com.periodicals.servlet;
 
 import com.periodicals.constant.Constants;
 import com.periodicals.bean.Magazine;
+import com.periodicals.exception.DBException;
 import com.periodicals.util.RoutingUtils;
 
 import javax.servlet.ServletException;
@@ -9,8 +10,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "MagazineByCategoryServlet", urlPatterns = "/magazines/*")
@@ -41,12 +40,14 @@ public class MagazineByCategoryServlet extends AbstractServlet {
         int recordsLimit = getRecordsLimit(request);
         int offset = getOffset();
 
-        List<Magazine> magazines = new ArrayList<>();
+        List<Magazine> magazines;
         try {
             magazines = getMagazineManager().findMagazinesByCategory(categoryUrl, column,
                     order, recordsLimit, offset);
-        } catch (SQLException exception) {
+        } catch (DBException exception) {
             exception.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
 
         if (magazines.isEmpty()) {

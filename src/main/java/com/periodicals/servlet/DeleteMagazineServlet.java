@@ -1,5 +1,6 @@
 package com.periodicals.servlet;
 
+import com.periodicals.exception.DBException;
 import com.periodicals.util.RoutingUtils;
 
 import javax.servlet.ServletException;
@@ -8,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.sql.SQLException;
 
 @WebServlet(name = "DeleteMagazineServlet", urlPatterns = "/cabinet/deleteMagazine")
 public class DeleteMagazineServlet extends AbstractServlet {
@@ -28,9 +28,10 @@ public class DeleteMagazineServlet extends AbstractServlet {
             deleteOldImage(request);
             message = "Magazine with id '" + magazineId + "' has been successfully deleted";
             messageType = "success";
-        } catch (SQLException exception) {
+        } catch (DBException exception) {
             exception.printStackTrace();
-            messageType = "error";
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
         HttpSession session = request.getSession();
         session.setAttribute("message", message);

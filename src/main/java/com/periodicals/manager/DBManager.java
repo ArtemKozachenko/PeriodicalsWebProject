@@ -19,13 +19,6 @@ public class DBManager {
             "ON m.publisher_id = p.id\n" +
             "ORDER BY m.%s %s\n" +
             "LIMIT %d, %d";
-    private static final String SELECT_ALL_MAGAZINES_QUERY = "SELECT m.*, c.category_name, p.publisher_name\n" +
-            "FROM magazines m\n" +
-            "JOIN categories c\n" +
-            "ON m.category_id = c.id\n" +
-            "JOIN publishers p\n" +
-            "ON m.publisher_id = p.id\n" +
-            "ORDER BY m.id desc";
     private static final String SELECT_ALL_CATEGORIES_QUERY = "SELECT * FROM categories";
     private static final String SELECT_ALL_PUBLISHERS_QUERY = "SELECT * FROM publishers";
     private static final String COUNT_ALL_MAGAZINES_QUERY = "SELECT COUNT(*) FROM magazines";
@@ -95,7 +88,7 @@ public class DBManager {
     private DBManager() {
     }
 
-    public List<Magazine> findAllMagazines(Connection connection, String column, String order, int limit, int offset) {
+    public List<Magazine> findAllMagazines(Connection connection, String column, String order, int limit, int offset) throws SQLException {
         List<Magazine> magazines = new ArrayList<>();
         Statement statement = null;
         ResultSet resultSet = null;
@@ -117,8 +110,6 @@ public class DBManager {
                 magazine.setPublisherName(resultSet.getString("publisher_name"));
                 magazines.add(magazine);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             DBUtils.close(resultSet);
             DBUtils.close(statement);
@@ -126,34 +117,7 @@ public class DBManager {
         return magazines;
     }
 
-    public List<Magazine> findAllMagazines(Connection connection) {
-        List<Magazine> magazines = new ArrayList<>();
-        Statement statement = null;
-        ResultSet resultSet = null;
-        try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(SELECT_ALL_MAGAZINES_QUERY);
-            while (resultSet.next()) {
-                Magazine magazine = new Magazine();
-                magazine.setId(resultSet.getInt("id"));
-                magazine.setMagazineName(resultSet.getString("magazine_name"));
-                magazine.setPrice(resultSet.getBigDecimal("price"));
-                magazine.setDescription(resultSet.getString("description"));
-                magazine.setImageLink(resultSet.getString("image_link"));
-                magazine.setCategoryName(resultSet.getString("category_name"));
-                magazine.setPublisherName(resultSet.getString("publisher_name"));
-                magazines.add(magazine);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DBUtils.close(resultSet);
-            DBUtils.close(statement);
-        }
-        return magazines;
-    }
-
-    public List<Magazine> searchMagazines(Connection connection, String searchQuery, String column, String order, int limit, int offset) {
+    public List<Magazine> searchMagazines(Connection connection, String searchQuery, String column, String order, int limit, int offset) throws SQLException {
         List<Magazine> magazines = new ArrayList<>();
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -178,8 +142,6 @@ public class DBManager {
                 magazine.setPublisherName(resultSet.getString("publisher_name"));
                 magazines.add(magazine);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             DBUtils.close(resultSet);
             DBUtils.close(statement);
@@ -187,7 +149,7 @@ public class DBManager {
         return magazines;
     }
 
-    public List<Category> findAllCategories(Connection connection) {
+    public List<Category> findAllCategories(Connection connection) throws SQLException {
         List<Category> categories = new ArrayList<>();
         Statement statement = null;
         ResultSet resultSet = null;
@@ -202,8 +164,6 @@ public class DBManager {
                 category.setProductCount(resultSet.getInt("product_count"));
                 categories.add(category);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             DBUtils.close(resultSet);
             DBUtils.close(statement);
@@ -211,7 +171,7 @@ public class DBManager {
         return categories;
     }
 
-    public List<Publisher> findAllPublishers(Connection connection) {
+    public List<Publisher> findAllPublishers(Connection connection) throws SQLException {
         List<Publisher> publishers = new ArrayList<>();
         Statement statement = null;
         ResultSet resultSet = null;
@@ -224,8 +184,6 @@ public class DBManager {
                 Publisher publisher = new Publisher(id, name);
                 publishers.add(publisher);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             DBUtils.close(resultSet);
             DBUtils.close(statement);
@@ -250,7 +208,7 @@ public class DBManager {
     }
 
     public List<Magazine> findMagazinesByCategory(Connection connection, String categoryUrl,
-                                                  String column, String order, int limit, int offset) {
+                                                  String column, String order, int limit, int offset) throws SQLException {
         List<Magazine> magazines = new ArrayList<>();
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -273,8 +231,6 @@ public class DBManager {
                 magazine.setPublisherName(resultSet.getString("publisher_name"));
                 magazines.add(magazine);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             DBUtils.close(resultSet);
             DBUtils.close(statement);
@@ -282,7 +238,7 @@ public class DBManager {
         return magazines;
     }
 
-    public List<User> findAllUsers(Connection connection, int limit, int offset) {
+    public List<User> findAllUsers(Connection connection, int limit, int offset) throws SQLException {
         List<User> users = new ArrayList<>();
         Statement statement = null;
         ResultSet resultSet = null;
@@ -304,8 +260,6 @@ public class DBManager {
                 user.setCreationDate(resultSet.getDate("creation_date").toLocalDate());
                 users.add(user);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             DBUtils.close(resultSet);
             DBUtils.close(statement);
@@ -329,7 +283,7 @@ public class DBManager {
         return count;
     }
 
-    public User findUserByLogin(Connection connection, String login) {
+    public User findUserByLogin(Connection connection, String login) throws SQLException {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         User user = null;
@@ -356,9 +310,6 @@ public class DBManager {
                 user.setSubscriptions(findUserSubscriptions(connection, user));
                 connection.commit();
             }
-        } catch (SQLException e) {
-            DBUtils.rollback(connection);
-            e.printStackTrace();
         } finally {
             DBUtils.close(resultSet);
             DBUtils.close(statement);
@@ -366,7 +317,7 @@ public class DBManager {
         return user;
     }
 
-    public List<Subscription> findUserSubscriptions(Connection connection, User user) {
+    private List<Subscription> findUserSubscriptions(Connection connection, User user) throws SQLException {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         List<Subscription> subscriptions = new ArrayList<>();
@@ -387,9 +338,6 @@ public class DBManager {
                 subscriptions.add(subscription);
             }
             connection.commit();
-        } catch (SQLException e) {
-            DBUtils.rollback(connection);
-            e.printStackTrace();
         } finally {
             DBUtils.close(resultSet);
             DBUtils.close(statement);
@@ -397,7 +345,7 @@ public class DBManager {
         return subscriptions;
     }
 
-    public Magazine findMagazine(Connection connection, int magazineId) {
+    public Magazine findMagazine(Connection connection, int magazineId) throws SQLException {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         Magazine magazine = null;
@@ -415,8 +363,6 @@ public class DBManager {
                 magazine.setCategoryName(resultSet.getString("category_name"));
                 magazine.setPublisherName(resultSet.getString("publisher_name"));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             DBUtils.close(resultSet);
             DBUtils.close(statement);
@@ -424,7 +370,7 @@ public class DBManager {
         return magazine;
     }
 
-    public User findUserByEmail(Connection connection, String email) {
+    public User findUserByEmail(Connection connection, String email) throws SQLException {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         User user = null;
@@ -432,22 +378,9 @@ public class DBManager {
             statement = connection.prepareStatement(String.format(FIND_USER_BY_SPECIFIC_COLUMN_QUERY, "email"));
             statement.setString(1, email);
             resultSet = statement.executeQuery();
-            while (resultSet.next()) {
+            if (resultSet.next()) {
                 user = new User();
-                user.setId(resultSet.getInt("id"));
-                user.setLogin(resultSet.getString("login"));
-                user.setPassword(resultSet.getString("password"));
-                user.setSalt(resultSet.getString("salt"));
-                user.setEmail(resultSet.getString("email"));
-                user.setFirstName(resultSet.getString("first_name"));
-                user.setLastName(resultSet.getString("last_name"));
-                user.setGender(resultSet.getString("gender"));
-                user.setStatus(resultSet.getString("status"));
-                user.setRole(Role.fromValue(resultSet.getString("role_name")));
-                user.setCreationDate(resultSet.getDate("creation_date").toLocalDate());
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             DBUtils.close(resultSet);
             DBUtils.close(statement);
@@ -455,7 +388,7 @@ public class DBManager {
         return user;
     }
 
-    public void createNewUser(Connection connection, User user) {
+    public void createNewUser(Connection connection, User user) throws SQLException {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         try {
@@ -480,16 +413,13 @@ public class DBManager {
                 statement.executeUpdate();
             }
             connection.commit();
-        } catch (SQLException e) {
-            DBUtils.rollback(connection);
-            e.printStackTrace();
         } finally {
             DBUtils.close(resultSet);
             DBUtils.close(statement);
         }
     }
 
-    public void updateWalletBalance(Connection connection, User user) {
+    public void updateWalletBalance(Connection connection, User user) throws SQLException {
         PreparedStatement statement = null;
         try {
             statement = connection.prepareStatement(UPDATE_E_WALLET_BALANCE);
@@ -497,14 +427,12 @@ public class DBManager {
             statement.setBigDecimal(k++, user.getWallet().getAmountOfMoney());
             statement.setInt(k++, user.getId());
             statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             DBUtils.close(statement);
         }
     }
 
-    public void createNewSubscription(Connection connection, Subscription subscription) {
+    public void createNewSubscription(Connection connection, Subscription subscription) throws SQLException {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         try {
@@ -524,16 +452,13 @@ public class DBManager {
             subscription.setStatus("active");
             updateWalletBalance(connection, subscription.getUser());
             connection.commit();
-        } catch (SQLException e) {
-            DBUtils.rollback(connection);
-            e.printStackTrace();
         } finally {
             DBUtils.close(resultSet);
             DBUtils.close(statement);
         }
     }
 
-    public void updateSubscriptionsStatus(Connection connection, List<Subscription> subscriptions) {
+    public void updateSubscriptionsStatus(Connection connection, List<Subscription> subscriptions) throws SQLException {
         PreparedStatement statement = null;
         try {
             connection.setAutoCommit(false);
@@ -545,15 +470,12 @@ public class DBManager {
             }
             statement.executeBatch();
             connection.commit();
-        } catch (SQLException e) {
-            DBUtils.rollback(connection);
-            e.printStackTrace();
         } finally {
             DBUtils.close(statement);
         }
     }
 
-    public void updateMagazine(Connection connection, Magazine magazine) {
+    public void updateMagazine(Connection connection, Magazine magazine) throws SQLException {
         PreparedStatement statement = null;
         try {
             int k = 1;
@@ -570,14 +492,12 @@ public class DBManager {
             statement.setInt(k++, magazine.getPublisherId());
             statement.setInt(k++, magazine.getId());
             statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             DBUtils.close(statement);
         }
     }
 
-    public void createNewMagazine(Connection connection, Magazine magazine) {
+    public void createNewMagazine(Connection connection, Magazine magazine) throws SQLException {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         try {
@@ -596,28 +516,24 @@ public class DBManager {
             if (resultSet.next()) {
                 magazine.setId(resultSet.getInt(1));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             DBUtils.close(resultSet);
             DBUtils.close(statement);
         }
     }
 
-    public void deleteMagazine(Connection connection, int magazineId) {
+    public void deleteMagazine(Connection connection, int magazineId) throws SQLException {
         PreparedStatement statement = null;
         try {
             statement = connection.prepareStatement(DELETE_MAGAZINE_QUERY);
             statement.setInt(1, magazineId);
             statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             DBUtils.close(statement);
         }
     }
 
-    public void updateUserStatus(Connection connection, int userId, String status) {
+    public void updateUserStatus(Connection connection, int userId, String status) throws SQLException {
         PreparedStatement statement = null;
         try {
             statement = connection.prepareStatement(UPDATE_USER_STATUS_QUERY);
@@ -625,8 +541,6 @@ public class DBManager {
             statement.setString(k++, status);
             statement.setInt(k++, userId);
             statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         } finally {
             DBUtils.close(statement);
         }

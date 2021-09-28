@@ -28,7 +28,7 @@
                         <c:if test="${errorString != null}">
                             <p style="color: #ff0000;">${errorString}</p>
                         </c:if>
-                        <form class="form" role="form" method="post" accept-charset="UTF-8"
+                        <form class="form" action="${pageContext.request.contextPath}/login" role="form" method="post" accept-charset="UTF-8"
                               id="login-nav">
                             <div class="form-group">
                                 <label class="sr-only" for="exampleInputEmail2">Email address</label>
@@ -58,4 +58,6 @@
             </li>
         </ul>
     </li>
+    <c:remove var="errorString" scope="session"/>
+    <c:remove var="user" scope="session"/>
 </ul>

@@ -2,6 +2,7 @@ package com.periodicals.servlet;
 
 import com.periodicals.constant.Constants;
 import com.periodicals.bean.User;
+import com.periodicals.exception.DBException;
 import com.periodicals.util.PasswordUtils;
 import com.periodicals.util.RoutingUtils;
 import com.periodicals.util.UserUtils;
@@ -11,7 +12,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.time.LocalDate;
 
 @WebServlet(name = "RegistrationServlet", urlPatterns = "/register")
@@ -52,8 +52,10 @@ public class RegistrationServlet extends AbstractServlet {
                                 "already exists with the email address " + email;
                     }
                 }
-            } catch (SQLException exception) {
+            } catch (DBException exception) {
                 exception.printStackTrace();
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
             }
         }
 
@@ -79,8 +81,10 @@ public class RegistrationServlet extends AbstractServlet {
         user.setCreationDate(LocalDate.now());
         try {
             getUserManager().insertNewUser(user);
-        } catch (SQLException exception) {
+        } catch (DBException exception) {
             exception.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
         response.sendRedirect(request.getContextPath() + "/login");
     }

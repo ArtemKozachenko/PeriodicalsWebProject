@@ -1,6 +1,7 @@
 package com.periodicals.filter;
 
 import com.periodicals.bean.User;
+import com.periodicals.exception.DBException;
 import com.periodicals.manager.UserManager;
 import com.periodicals.util.UserUtils;
 
@@ -10,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.sql.SQLException;
 
 @WebFilter(filterName = "CookieFilter")
 public class CookieFilter implements Filter {
@@ -31,8 +31,10 @@ public class CookieFilter implements Filter {
         try {
             User user = UserManager.getInstance().findUserByLogin(userLogin);
             UserUtils.storeLoginedUser(session, user);
-        } catch (SQLException exception) {
+        } catch (DBException exception) {
             exception.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
         chain.doFilter(request, response);
     }

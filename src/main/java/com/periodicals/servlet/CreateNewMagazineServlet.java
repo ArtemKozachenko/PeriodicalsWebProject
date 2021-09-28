@@ -1,6 +1,7 @@
 package com.periodicals.servlet;
 
 import com.periodicals.bean.Magazine;
+import com.periodicals.exception.DBException;
 import com.periodicals.util.RoutingUtils;
 
 import javax.servlet.ServletException;
@@ -12,7 +13,6 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import java.io.*;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 
 @WebServlet(name = "CreateNewMagazineServlet", urlPatterns = "/cabinet/createMagazine")
 @MultipartConfig(
@@ -41,9 +41,10 @@ public class CreateNewMagazineServlet extends AbstractServlet {
             getMagazineManager().createNewMagazine(magazine);
             message = "Magazine '" + magazineName + "' has been successfully added";
             messageType = "success";
-        } catch (SQLException exception) {
+        } catch (DBException exception) {
             exception.printStackTrace();
-            messageType = "error";
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
         HttpSession session = request.getSession();
         session.setAttribute("message", message);

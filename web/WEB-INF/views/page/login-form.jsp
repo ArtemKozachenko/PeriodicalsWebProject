@@ -28,7 +28,7 @@
             <input type="password" class="form-control" name="password" value="${user.password}" placeholder="Password">
         </div>
         <div class="form-group">
-            <button type="submit" class="btn btn-primary btn-block" name="loginAttempt" value="Y">Sign in</button>
+            <button type="submit" class="btn btn-primary btn-block">Sign in</button>
         </div>
         <div class="checkbox">
             <label>
@@ -36,4 +36,6 @@
             </label>
         </div>
     </form>
+    <c:remove var="errorString" scope="session"/>
+    <c:remove var="user" scope="session"/>
 </div>
