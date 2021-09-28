@@ -12,16 +12,19 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="tag-files" tagdir="/WEB-INF/tags" %>
 
+<fmt:setLocale value="${lang}"/>
+<fmt:setBundle basename="messages"/>
+
 <c:set var="searchQuery" scope="page" value="${searchQuery}"/>
 <div id="productList" data-page-count="${pageCount}" data-page-number="1">
     <form>
         <select class="sort-block" name="java-navigator" onchange="top.location.href =
   this.options[this.selectedIndex].value;">
-            <option value="#">Sort by ${sortingName == null ? 'Name: A-Z' : sortingName}</option>
-            <option value="?sort=magazine_name-asc${searchQuery}">Name: A-Z</option>
-            <option value="?sort=magazine_name-desc${searchQuery}">Name: Z-A</option>
-            <option value="?sort=price-asc${searchQuery}">Price: Low to High</option>
-            <option value="?sort=price-desc${searchQuery}">Price: High to Low</option>
+            <option value="#"><fmt:message key="sorting.sortBy"/> ${sortingName == null ? 'Name: A-Z' : sortingName}</option>
+            <option value="?sort=magazine_name-asc${searchQuery}"><fmt:message key="sorting.nameAsc"/></option>
+            <option value="?sort=magazine_name-desc${searchQuery}"><fmt:message key="sorting.nameDesc"/></option>
+            <option value="?sort=price-asc${searchQuery}"><fmt:message key="sorting.priceAsc"/></option>
+            <option value="?sort=price-desc${searchQuery}"><fmt:message key="sorting.priceDesc"/></option>
         </select>
     </form>
     <div class="row">
@@ -35,13 +38,13 @@
                             <div class="desc">
                                 <div class="cell">
                                     <p>
-                                        <span class="title">Details</span> ${magazine.description}
+                                        <span class="title"><fmt:message key="magazineItem.details"/></span> ${magazine.description}
                                     </p>
                                 </div>
                             </div>
                         </div>
                         <h4 class="name">${magazine.magazineName}</h4>
-                        <div class="code">Code: ${magazine.id}</div>
+                        <div class="code"><fmt:message key="magazineItem.code"/>: ${magazine.id}</div>
                         <div class="price">$ ${magazine.price}</div>
                         <c:if test="${loginedUser != null}">
                             <c:set var="subscriptions" scope="page" value="${loginedUser.subscriptions}"/>
@@ -62,8 +65,8 @@
                         </div>
 
                         <div class="list-group">
-                            <span class="list-group-item"><small>Category: </small><span class="category">${magazine.categoryName}</span></span>
-                            <span class="list-group-item"><small>Publisher: </small><span class="producer">${magazine.publisherName}</span></span>
+                            <span class="list-group-item"><small><fmt:message key="magazineItem.category"/>: </small><span class="category">${magazine.categoryName}</span></span>
+                            <span class="list-group-item"><small><fmt:message key="magazineItem.publisher"/>: </small><span class="producer">${magazine.publisherName}</span></span>
                         </div>
                     </div>
                 </div>
@@ -77,14 +80,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Sign In</h4>
+                    <h4 class="modal-title" id="myModalLabel"><fmt:message key="loginDropDown.signIn"/></h4>
                 </div>
                 <div class="modal-body">
-                    <div style="text-align: center"><span style="color: #ff0000;">You need to be authorized to subscribe</span></div>
+                    <div style="text-align: center"><span style="color: #ff0000;"><fmt:message key="loginDropDown.warningLabel"/></span></div>
                     <jsp:include page="../fragment/login-form-fields.jsp"/>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><fmt:message key="loginDropDown.closeButton"/></button>
 
                 </div>
             </div>
